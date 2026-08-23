@@ -1,100 +1,117 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ShieldCheck, MapPin, AlertTriangle, Users, LayoutDashboard, Menu, X } from 'lucide-react';
+import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { 
+  ShieldCheck, 
+  MapPin, 
+  PhoneCall, 
+  LayoutDashboard, 
+  Route, 
+  Rss, 
+  Phone, 
+  LogOut 
+} from 'lucide-react';
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navLinks = [
-    { name: 'Home', path: '/', icon: ShieldCheck },
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'Planner', path: '/planner', icon: MapPin },
-    { name: 'Feed', path: '/feed', icon: AlertTriangle },
-    { name: 'Contacts', path: '/contacts', icon: Users },
+    { name: 'Route Planner', path: '/planner', icon: Route },
+    { name: 'Community Feed', path: '/feed', icon: Rss },
+    { name: 'Emergency', path: '/contacts', icon: Phone },
   ];
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 text-emerald-400 font-bold text-lg">
-            <ShieldCheck className="w-7 h-7" />
-            <span>SafeRoute</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = location.pathname === link.path;
-              return (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-slate-800 text-emerald-400 border border-slate-700'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {link.name}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* CTA / Auth Button */}
-          <div className="hidden md:block">
-            <Link
-              to="/auth"
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-sm rounded-xl transition-all"
-            >
-              Sign In
-            </Link>
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-slate-400 hover:text-white focus:outline-none"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+    <header style={{ width: '100%', fontFamily: 'system-ui, -apple-system, sans-serif', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 1000 }}>
+      
+      {/* 1. TOP UTILITY BANNER (Cyan #00b4d8) */}
+      <div style={{ backgroundColor: '#00b4d8', padding: '6px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#ffffff', fontWeight: '600' }}>
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <MapPin size={13} /> Dhaka Traffic & Security Control
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <PhoneCall size={13} /> National Helpline: 999 | BD Police Command
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span>support@saferoute.bd</span>
+          <Link to="/" style={{ color: '#ffffff', textDecoration: 'none', fontWeight: '700' }}>Back to Home</Link>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
-      {isOpen && (
-        <div className="md:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+      {/* 2. MAIN HEADER BAR */}
+      <div style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        
+        {/* Brand Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+          <div style={{ backgroundColor: '#e0f2fe', padding: '8px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ShieldCheck size={26} color="#00b4d8" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: '19px', fontWeight: '900', color: '#00b4d8', letterSpacing: '-0.5px', lineHeight: 1 }}>SAFEROUTE</span>
+            <span style={{ fontSize: '8px', fontWeight: '800', color: '#64748b', letterSpacing: '1px', textTransform: 'uppercase', marginTop: '3px' }}>NIGHT COMMUTE SAFETY</span>
+          </div>
+        </div>
+
+        {/* Clean Navigation Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {navLinks.map((link) => {
             const Icon = link.icon;
+            const active = isActive(link.path);
             return (
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: active ? '800' : '600',
+                  color: active ? '#00b4d8' : '#64748b',
+                  backgroundColor: active ? '#f0f9ff' : 'transparent',
+                  textDecoration: 'none',
+                  borderBottom: active ? '2px solid #00b4d8' : '2px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <Icon className="w-4 h-4 text-emerald-400" />
+                <Icon size={15} color={active ? '#00b4d8' : '#64748b'} />
                 {link.name}
               </Link>
             );
           })}
-          <Link
-            to="/auth"
-            onClick={() => setIsOpen(false)}
-            className="block text-center mt-2 px-4 py-2 bg-emerald-500 text-slate-950 font-bold text-sm rounded-xl"
+
+          <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0', margin: '0 8px' }} />
+
+          {/* Logout Action */}
+          <button
+            onClick={() => navigate('/auth')}
+            style={{
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#ef4444',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '12px'
+            }}
           >
-            Sign In
-          </Link>
+            <LogOut size={14} /> Log out
+          </button>
         </div>
-      )}
-    </nav>
+
+      </div>
+
+    </header>
   );
 }

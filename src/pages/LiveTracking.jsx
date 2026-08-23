@@ -1,62 +1,52 @@
 import React, { useState } from 'react';
-import { ShieldCheck, AlertCircle, Share2, PhoneCall, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldAlert, Navigation, Phone, CheckCircle } from 'lucide-react';
 
 export default function LiveTracking() {
   const [sosActive, setSosActive] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Top Banner */}
-      <header className="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2 text-emerald-400 font-bold">
-          <ShieldCheck className="w-6 h-6" /> Live Tracking Active[cite: 1]
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-4xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <Navigation className="text-emerald-400" /> Active Trip Tracking
+          </h1>
+          <p className="text-slate-400 text-xs mt-1">Destination: Hostel Block B • ETA: 12 mins</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
-          <span className="text-xs text-emerald-400 font-semibold">Broadcasting Location</span>
+        <Link to="/dashboard" className="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300">
+          End Navigation
+        </Link>
+      </div>
+
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl h-64 flex items-center justify-center text-center p-6 relative">
+        <div className="space-y-2">
+          <div className="w-4 h-4 bg-emerald-400 rounded-full animate-ping mx-auto" />
+          <p className="text-xs text-slate-400">Live GPS broadcasting location to emergency network</p>
         </div>
-      </header>
+      </div>
 
-      {/* Main Container */}
-      <div className="flex-1 flex flex-col md:flex-row">
-        {/* Map Placeholder */}
-        <main className="flex-1 bg-slate-950 flex items-center justify-center p-6 border-r border-slate-900">
-          <p className="text-slate-600 text-sm">Real-time GPS Tracking Map View</p>
-        </main>
-
-        {/* Live Controls */}
-        <aside className="w-full md:w-96 p-6 bg-slate-900 flex flex-col justify-between gap-6">
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold text-white">Journey Status</h2>
-            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <CheckCircle className="w-4 h-4 text-emerald-400" /> Destination: East Hostel
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <CheckCircle className="w-4 h-4 text-emerald-400" /> Shared with 2 Emergency Contacts[cite: 1]
-              </div>
-            </div>
-
-            <button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 rounded-xl border border-slate-700 flex items-center justify-center gap-2 text-sm">
-              <Share2 className="w-4 h-4" /> Copy Share Link[cite: 1]
+      <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">
+        {sosActive ? (
+          <div className="bg-rose-500/10 border border-rose-500/30 p-6 rounded-xl space-y-3">
+            <ShieldAlert className="w-10 h-10 text-rose-500 mx-auto animate-bounce" />
+            <h2 className="text-lg font-bold text-rose-400">SOS ALERT ACTIVATED</h2>
+            <p className="text-xs text-slate-400">Emergency contacts and campus security notified with your exact coordinates.</p>
+            <button onClick={() => setSosActive(false)} className="bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-4 py-2 rounded-lg">
+              Cancel False Alarm
             </button>
           </div>
-
-          {/* Emergency SOS Trigger */}
-          <div className="bg-rose-500/10 border border-rose-500/20 p-6 rounded-2xl text-center space-y-4">
-            <h3 className="text-sm font-bold text-rose-400">Emergency Response</h3>
+        ) : (
+          <div>
             <button 
-              onClick={() => setSosActive(!sosActive)}
-              className={`w-28 h-28 rounded-full font-extrabold mx-auto shadow-lg flex flex-col items-center justify-center transition-all ${
-                sosActive ? 'bg-rose-700 animate-pulse text-white' : 'bg-rose-600 hover:bg-rose-700 text-white'
-              }`}
+              onClick={() => setSosActive(true)}
+              className="w-32 h-32 bg-rose-600 hover:bg-rose-700 text-white font-black text-xl rounded-full shadow-2xl border-4 border-rose-900 mx-auto flex items-center justify-center transition-transform active:scale-95"
             >
-              <AlertCircle className="w-8 h-8 mb-1" />
-              <span className="text-xs">{sosActive ? 'ALERT SENT' : 'PRESS SOS'}</span>
+              PRESS SOS
             </button>
-            <p className="text-xs text-slate-400">Sends live coordinates to contacts instantly[cite: 1].</p>
+            <p className="text-xs text-slate-400 mt-3">Tap to instantly alert your emergency network</p>
           </div>
-        </aside>
+        )}
       </div>
     </div>
   );

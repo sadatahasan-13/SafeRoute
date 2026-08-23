@@ -1,72 +1,146 @@
-import React, { useState } from 'react';
-import { Navigation, ShieldCheck, AlertTriangle, MapPin, Share2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { 
+  BarChart2, 
+  MapPin, 
+  ShieldCheck, 
+  PhoneCall, 
+  Clock, 
+  Plus, 
+  Search, 
+  Send 
+} from 'lucide-react';
 
 export default function RoutePlanner() {
-  const [selectedRoute, setSelectedRoute] = useState(1);
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row">
-      <aside className="w-full md:w-96 p-6 bg-slate-900 border-r border-slate-800 flex flex-col gap-6">
-        <Link to="/dashboard" className="text-xs text-slate-400 hover:text-white">← Back to Dashboard</Link>
-        <div>
-          <h1 className="text-2xl font-bold text-emerald-400 flex items-center gap-2">
-            <ShieldCheck className="w-7 h-7" /> Route Planner
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">Find lighting-optimized travel paths[cite: 1]</p>
-        </div>
+    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', padding: '24px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      
+      {/* Page Title */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+          Dhaka Night Commute Planner & Safety Escort Flow
+        </h1>
+        <span style={{ fontSize: '12px', fontWeight: '600', color: '#64748b' }}>
+          Live Synchronized with Dhaka Police Night Patrol Grid
+        </span>
+      </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center bg-slate-950 rounded-xl px-3 py-2.5 border border-slate-800">
-            <MapPin className="w-5 h-5 text-emerald-400 mr-2" />
-            <input type="text" defaultValue="AUST Campus Gate 1" className="bg-transparent border-none focus:outline-none text-sm w-full text-white" />
+      {/* Main 3-Column Layout Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr 1.1fr', gap: '20px' }}>
+        
+        {/* Column 1: Route Analytics */}
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <div style={{ backgroundColor: '#00b4d8', color: '#ffffff', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontWeight: '700', fontSize: '15px' }}>Route Analytics</span>
+            <BarChart2 size={18} />
           </div>
-          <div className="flex items-center bg-slate-950 rounded-xl px-3 py-2.5 border border-slate-800">
-            <Navigation className="w-5 h-5 text-indigo-400 mr-2" />
-            <input type="text" placeholder="Enter Destination..." className="bg-transparent border-none focus:outline-none text-sm w-full text-white" />
-          </div>
-        </div>
-
-        <div className="space-y-3 flex-1">
-          <h2 className="text-xs uppercase text-slate-400 font-semibold tracking-wider">Suggested Routes</h2>
           
-          <div 
-            onClick={() => setSelectedRoute(1)}
-            className={`p-4 rounded-xl cursor-pointer border transition-all ${selectedRoute === 1 ? 'border-emerald-500 bg-slate-800' : 'border-slate-800 bg-slate-950'}`}
-          >
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-sm text-white">Via Main Avenue</h3>
-              <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">95% Safe</span>
+          <div style={{ padding: '20px' }}>
+            {/* Metric Box */}
+            <div style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '12px', padding: '20px', textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '36px', fontWeight: '900', color: '#00b4d8', lineHeight: 1 }}>18</div>
+              <div style={{ fontSize: '10px', fontWeight: '800', color: '#0369a1', marginTop: '6px', letterSpacing: '0.5px' }}>
+                DHAKA NIGHT ROUTES COMPLETED
+              </div>
             </div>
-            <p className="text-xs text-slate-400 mt-2">12 min (1.1 km) • Well Lit • CCTV Covered</p>
-          </div>
 
-          <div 
-            onClick={() => setSelectedRoute(2)}
-            className={`p-4 rounded-xl cursor-pointer border transition-all ${selectedRoute === 2 ? 'border-amber-500 bg-slate-800' : 'border-slate-800 bg-slate-950'}`}
-          >
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-sm text-white">Via Back Alley</h3>
-              <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-bold">52% Safe</span>
-            </div>
-            <p className="text-xs text-slate-400 mt-2">8 min (0.7 km) • Poor Lighting</p>
-            <div className="flex items-center gap-1 text-xs text-amber-400 mt-2">
-              <AlertTriangle className="w-3.5 h-3.5" /> 2 dark spot reports
+            {/* Commuter Density Chart */}
+            <div>
+              <div style={{ textAlign: 'center', fontSize: '12px', fontWeight: '700', color: '#64748b', marginBottom: '16px' }}>
+                Commuter Density per Day
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '140px', padding: '0 10px' }}>
+                {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, idx) => {
+                  const heights = [35, 75, 45, 60, 50, 95, 40];
+                  const isFriday = day === 'FRI';
+                  return (
+                    <div key={day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', flex: 1 }}>
+                      <div style={{ 
+                        width: '18px', 
+                        height: `${heights[idx]}px`, 
+                        backgroundColor: isFriday ? '#00b4d8' : '#cbd5e1', 
+                        borderRadius: '4px' 
+                      }} />
+                      <span style={{ fontSize: '10px', fontWeight: '700', color: isFriday ? '#00b4d8' : '#94a3b8' }}>{day}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
 
-        <Link to="/tracking" className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors">
-          <Share2 className="w-5 h-5" /> Start Journey
-        </Link>
-      </aside>
+        {/* Column 2: Stop Config & Safety */}
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <span style={{ fontWeight: '700', fontSize: '15px', color: '#0f172a' }}>Stop Config & Safety</span>
+            <Search size={18} color="#64748b" />
+          </div>
 
-      <main className="flex-1 bg-slate-950 flex items-center justify-center p-6 border-l border-slate-900">
-        <div className="text-center text-slate-600">
-          <MapPin className="w-12 h-12 mx-auto mb-2 text-slate-700 animate-bounce" />
-          <p className="text-sm">Interactive Map View Placeholder</p>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <div style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a' }}>TSC Dhaka University Hub</div>
+            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>University of Dhaka, Shahbagh, Dhaka 1000</div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ backgroundColor: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '13px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <MapPin size={16} /> Add Metro Gate 2 Stop
+              </span>
+              <Plus size={16} color="#00b4d8" style={{ cursor: 'pointer' }} />
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
+                <ShieldCheck size={16} /> Safety Rating
+              </span>
+              <span style={{ fontWeight: '700', color: '#10b981' }}>96% High Lighting</span>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
+                <PhoneCall size={16} /> Nearby Guard
+              </span>
+              <span style={{ fontWeight: '700', color: '#00b4d8' }}>Shahbagh Police Box</span>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
+                <Clock size={16} /> Expected Stopover
+              </span>
+              <span style={{ fontWeight: '700', color: '#0f172a' }}>5 mins</span>
+            </div>
+          </div>
         </div>
-      </main>
+
+        {/* Column 3: Interactive Route Flow */}
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          <div style={{ backgroundColor: '#f8fafc', borderRadius: '12px', padding: '30px 20px', textAlign: 'center', position: 'relative', backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '12px 12px' }}>
+            <div style={{ backgroundColor: '#00b4d8', color: '#ffffff', display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: '700', boxShadow: '0 2px 8px rgba(0,180,216,0.3)' }}>
+              <Send size={14} /> Dhanmondi 32 Overbridge
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ backgroundColor: '#f0f9ff', borderLeft: '4px solid #00b4d8', borderRadius: '8px', padding: '12px 16px' }}>
+              <div style={{ fontWeight: '800', fontSize: '13px', color: '#0369a1' }}>Start: TSC Hub</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>University of Dhaka - Metro Gate 1</div>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 16px', textAlign: 'center' }}>
+              <div style={{ fontWeight: '700', fontSize: '13px', color: '#334155' }}>Mirpur Road Stop</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Dhanmondi Road 2 - High Street Lamp Zone</div>
+            </div>
+
+            <div style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 16px', textAlign: 'center' }}>
+              <div style={{ fontWeight: '700', fontSize: '13px', color: '#334155' }}>Farmgate Metro Station</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>Police Box Entrance & CCTV Surveillance</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
     </div>
   );
 }
