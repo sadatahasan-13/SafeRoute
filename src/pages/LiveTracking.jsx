@@ -1,53 +1,106 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, Navigation, Phone, CheckCircle } from 'lucide-react';
+import { MapPin, ShieldCheck, Users, AlertTriangle } from 'lucide-react';
 
-export default function LiveTracking() {
-  const [sosActive, setSosActive] = useState(false);
-
+export default function Tracking() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-6xl mx-auto space-y-6">
+
+      <nav className="flex justify-between items-center bg-slate-900 border border-slate-800 p-4 rounded-2xl">
+        <h2 className="font-bold text-emerald-400">SafeRoute</h2>
+
+        <div className="flex gap-5 text-xs text-slate-400">
+          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/planner">Route Planner</Link>
+          <Link to="/tracking" className="text-white">Live Tracking</Link>
+          <Link to="/report">Report</Link>
+          <Link to="/contacts">Contacts</Link>
+        </div>
+      </nav>
+
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Navigation className="text-emerald-400" /> Active Trip Tracking
-          </h1>
-          <p className="text-slate-400 text-xs mt-1">Destination: Hostel Block B • ETA: 12 mins</p>
+          <h1 className="text-2xl font-bold">Live Journey</h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Keep an eye on your journey while travelling.
+          </p>
         </div>
-        <Link to="/dashboard" className="text-xs bg-slate-900 border border-slate-800 hover:bg-slate-800 px-3 py-2 rounded-xl text-slate-300">
-          End Navigation
-        </Link>
+
+        <span className="text-emerald-400 text-xs bg-emerald-500/10 px-3 py-2 rounded-xl">
+          ● Journey Active
+        </span>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl h-64 flex items-center justify-center text-center p-6 relative">
-        <div className="space-y-2">
-          <div className="w-4 h-4 bg-emerald-400 rounded-full animate-ping mx-auto" />
-          <p className="text-xs text-slate-400">Live GPS broadcasting location to emergency network</p>
-        </div>
-      </div>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
 
-      <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center space-y-4">
-        {sosActive ? (
-          <div className="bg-rose-500/10 border border-rose-500/30 p-6 rounded-xl space-y-3">
-            <ShieldAlert className="w-10 h-10 text-rose-500 mx-auto animate-bounce" />
-            <h2 className="text-lg font-bold text-rose-400">SOS ALERT ACTIVATED</h2>
-            <p className="text-xs text-slate-400">Emergency contacts and campus security notified with your exact coordinates.</p>
-            <button onClick={() => setSosActive(false)} className="bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-4 py-2 rounded-lg">
-              Cancel False Alarm
-            </button>
+        <div className="h-72 bg-slate-800 flex items-center justify-center">
+          <div className="text-center">
+            <MapPin className="mx-auto text-emerald-400 mb-3" size={35} />
+            <p className="text-sm">Live Map</p>
+            <p className="text-xs text-slate-500">
+              Current Location → Home
+            </p>
           </div>
-        ) : (
+        </div>
+
+        <div className="grid grid-cols-3 text-center p-5">
+
           <div>
-            <button 
-              onClick={() => setSosActive(true)}
-              className="w-32 h-32 bg-rose-600 hover:bg-rose-700 text-white font-black text-xl rounded-full shadow-2xl border-4 border-rose-900 mx-auto flex items-center justify-center transition-transform active:scale-95"
-            >
-              PRESS SOS
-            </button>
-            <p className="text-xs text-slate-400 mt-3">Tap to instantly alert your emergency network</p>
+            <p className="text-xs text-slate-500">Distance Left</p>
+            <p className="font-bold mt-1">2.3 km</p>
           </div>
-        )}
+
+          <div>
+            <p className="text-xs text-slate-500">Estimated Time</p>
+            <p className="font-bold mt-1">12 min</p>
+          </div>
+
+          <div>
+            <p className="text-xs text-slate-500">Safety Score</p>
+            <p className="font-bold text-emerald-400 mt-1">90%</p>
+          </div>
+
+        </div>
       </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+
+        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+          <Users className="text-indigo-400 mb-3" />
+
+          <h3 className="font-bold text-sm">Location Sharing</h3>
+
+          <p className="text-xs text-slate-400 mt-1">
+            Your trusted contacts can follow your journey.
+          </p>
+
+          <div className="mt-4 space-y-2 text-xs">
+            <p className="text-emerald-400">● Mom — Online</p>
+            <p className="text-emerald-400">● Rahim — Online</p>
+          </div>
+        </div>
+
+        <div className="bg-rose-950/30 border border-rose-900 p-5 rounded-2xl">
+
+          <AlertTriangle className="text-rose-400 mb-3" />
+
+          <h3 className="font-bold text-sm">Emergency?</h3>
+
+          <p className="text-xs text-slate-400 mt-1">
+            Send your live location to your emergency contacts.
+          </p>
+
+          <button
+            onClick={() => alert("SOS alert sent!")}
+            className="w-full mt-4 bg-rose-600 hover:bg-rose-700 py-2 rounded-xl text-xs font-bold"
+          >
+            SEND SOS
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }
