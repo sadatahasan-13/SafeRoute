@@ -1,14 +1,39 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
-  ShieldCheck, MapPin, Navigation, PhoneCall, LogOut, 
-  RefreshCw, Calendar, Search, Maximize2, AlertTriangle
+  ShieldCheck, MapPin, Navigation, PhoneCall, 
+  RefreshCw, Calendar, Search, Maximize2
 } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [selectedCommuter, setSelectedCommuter] = useState(4); // Default selected: Tanvir Ahmed
   const [mapType, setMapType] = useState('map');
+
+  // Only show the welcome popup once right after login
+  const [showWelcomeModal, setShowWelcomeModal] = useState(() => {
+    return sessionStorage.getItem('show_welcome_popup') === 'true';
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshNotice, setRefreshNotice] = useState('');
+  const [currentDate, setCurrentDate] = useState(() => {
+    return new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  });
+
+  const handleRefreshDashboard = () => {
+    setIsRefreshing(true);
+    setRefreshNotice('Syncing GPS telemetry...');
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setRefreshNotice('Live feed updated!');
+      setTimeout(() => setRefreshNotice(''), 2000);
+    }, 600);
+  };
+
+  const handleDismissWelcomeModal = () => {
+    setShowWelcomeModal(false);
+    sessionStorage.removeItem('show_welcome_popup');
+  };
 
   const commuters = [
     { id: 0, name: 'Anika Rahman', score: '98% Safe', distance: '1.2 km', time: '15 min', status: 'In Transit', color: '#10b981' },
@@ -23,44 +48,118 @@ export default function Dashboard() {
     { step: 2, title: 'Dhanmondi 32 Bridge', address: 'Mirpur Road - Metro Rail Gate 2 Plaza', time: 'est 10:03am', active: false },
     { step: 3, title: 'Uttara Sector 7 Hub', address: 'Rabindra Sarani - West Gate Terminal', time: 'est 10:28am', active: false },
     { step: 4, title: 'Shahbagh Crossing', address: 'Kazi Nazrul Islam Ave - Police Box Gate 3', time: 'est 10:57am', active: false },
-    { step: 5, title: 'Mirpur 10 Circle', address: 'Begum Rokeya Sarani - Night Patrol Hub', time: 'est 11:23am', tag: 'High Lighting', active: false },
+    { step: 5, title: 'Mirpur 10 Circle', address: 'Begum Rokeya Sarani - Night Patrol Hub', time: 'est 11:23am', active: false },
   ];
+
+  let user = {};
+  try {
+    user = JSON.parse(localStorage.getItem('user') || '{}');
+  } catch (e) {
+    user = {};
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('http://localhost:5000/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout failed:', e);
+    } finally {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('show_welcome_popup');
+      navigate('/auth');
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#e2e8f0', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#1e293b', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       
-      {/* 1. TOP HEADER BANNER (Cyan #00b4d8) */}
-      <header style={{ backgroundColor: '#00b4d8', padding: '10px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#ffffff', fontSize: '13px', fontWeight: '600' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
-            <ShieldCheck size={22} color="#ffffff" />
-            <span style={{ fontWeight: '900', fontSize: '16px', letterSpacing: '-0.5px' }}>SAFEROUTE</span>
-          </div>
-          <span style={{ opacity: 0.8 }}>|</span>
-          <span>Howdy, Tanvir!</span>
-        </div>
+      {/* WELCOME POPUP MODAL (Middle of the window) */}
+      {showWelcomeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            padding: '36px 32px',
+            maxWidth: '420px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid #e2e8f0'
+          }}>
+            {/* SafeRoute Brand Icon Circle */}
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: '#e0f2fe',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 18px auto'
+            }}>
+              <ShieldCheck size={36} color="#00b4d8" />
+            </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '12px' }}>
-          <Link to="/planner" style={{ color: '#ffffff', textDecoration: 'none' }}>Route Planner</Link>
-          <Link to="/feed" style={{ color: '#ffffff', textDecoration: 'none' }}>Community Feed</Link>
-          <Link to="/contacts" style={{ color: '#ffffff', textDecoration: 'none' }}>Emergency</Link>
-          <Link to="/profile" style={{ color: '#ffffff', textDecoration: 'none' }}>Profile</Link>
-          <button onClick={() => navigate('/auth')} style={{ backgroundColor: 'transparent', border: 'none', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-            <LogOut size={14} /> Log out
-          </button>
+            <h2 style={{
+              fontSize: '24px',
+              fontWeight: '900',
+              color: '#0f172a',
+              margin: '0 0 10px 0',
+              letterSpacing: '-0.5px'
+            }}>
+              Welcome, {user.name || user.email || 'User'}!
+            </h2>
+
+            <p style={{
+              fontSize: '14px',
+              color: '#64748b',
+              lineHeight: 1.6,
+              margin: '0 0 28px 0'
+            }}>
+              You are now signed in to SafeRoute Night Navigation. Your commute routes and real-time safety escort features are ready.
+            </p>
+
+            <button
+              onClick={handleDismissWelcomeModal}
+              style={{
+                backgroundColor: '#00b4d8',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 32px',
+                borderRadius: '8px',
+                fontWeight: '800',
+                fontSize: '15px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(0, 180, 216, 0.35)',
+                transition: 'all 0.2s ease',
+                width: '100%'
+              }}
+            >
+              OK
+            </button>
+          </div>
         </div>
-      </header>
+      )}
 
       {/* 2. SUB BAR TITLE */}
       <div style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #cbd5e1', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#334155' }}>
           Route Dashboard & Live Dispatch (Dhaka Zone)
         </h1>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={() => navigate('/report')} style={{ backgroundColor: '#ef4444', color: '#ffffff', border: 'none', padding: '6px 14px', borderRadius: '4px', fontWeight: '700', fontSize: '11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <AlertTriangle size={14} /> REPORT HAZARD
-          </button>
-        </div>
       </div>
 
       {/* 3. MAIN DASHBOARD CONTENT GRID */}
@@ -71,11 +170,29 @@ export default function Dashboard() {
           
           {/* Calendar Toolbar Bar */}
           <div style={{ backgroundColor: '#00b4d8', borderRadius: '6px 6px 0 0', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#ffffff', fontSize: '12px', fontWeight: '600' }}>
-            <span>Sun, Aug 23, 2026</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>{currentDate}</span>
+              {refreshNotice && (
+                <span style={{ backgroundColor: 'rgba(255, 255, 255, 0.25)', padding: '2px 8px', borderRadius: '10px', fontSize: '10px', fontWeight: '700' }}>
+                  {refreshNotice}
+                </span>
+              )}
+            </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <button style={{ backgroundColor: '#ffffff', color: '#00b4d8', border: 'none', padding: '4px 10px', borderRadius: '4px', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer' }}>Today</button>
-              <button style={{ backgroundColor: '#ffffff', color: '#00b4d8', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><Calendar size={14} /></button>
-              <button style={{ backgroundColor: '#ffffff', color: '#00b4d8', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><RefreshCw size={14} /></button>
+              <button 
+                onClick={() => setCurrentDate(new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }))}
+                style={{ backgroundColor: '#ffffff', color: '#00b4d8', border: 'none', padding: '4px 10px', borderRadius: '4px', fontWeight: 'bold', fontSize: '11px', cursor: 'pointer' }}
+              >
+                Today
+              </button>
+              <button 
+                onClick={handleRefreshDashboard}
+                disabled={isRefreshing}
+                title="Refresh live commuter tracking"
+                style={{ backgroundColor: '#ffffff', color: '#00b4d8', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: isRefreshing ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
+              >
+                <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+              </button>
             </div>
           </div>
 
@@ -122,11 +239,6 @@ export default function Dashboard() {
                       <span style={{ fontSize: '10px', color: '#94a3b8' }}>{wp.time}</span>
                     </div>
                     <p style={{ margin: '2px 0 0 0', fontSize: '11px', color: '#64748b' }}>{wp.address}</p>
-                    {wp.tag && (
-                      <span style={{ backgroundColor: '#00b4d8', color: '#ffffff', fontSize: '9px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '3px', display: 'inline-block', marginTop: '4px' }}>
-                        {wp.tag}
-                      </span>
-                    )}
                   </div>
                 </div>
               ))}
@@ -198,4 +310,4 @@ export default function Dashboard() {
 
     </div>
   );
-}``
+}

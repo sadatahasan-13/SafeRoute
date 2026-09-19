@@ -2,7 +2,6 @@ import React from 'react';
 import { 
   BarChart2, 
   MapPin, 
-  ShieldCheck, 
   PhoneCall, 
   Clock, 
   Plus, 
@@ -12,20 +11,32 @@ import {
 
 export default function RoutePlanner() {
   return (
-    <div style={{ backgroundColor: '#f1f5f9', minHeight: '100vh', padding: '24px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ 
+      backgroundColor: '#f1f5f9', 
+      minHeight: '100vh', 
+      width: '100%', 
+      padding: '24px 32px', 
+      fontFamily: 'system-ui, -apple-system, sans-serif', 
+      boxSizing: 'border-box' 
+    }}>
       
-      {/* Page Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: 0 }}>
+      {/* Page Title Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a', margin: 0 }}>
           Dhaka Night Commute Planner & Safety Escort Flow
         </h1>
-        <span style={{ fontSize: '12px', fontWeight: '600', color: '#64748b' }}>
+        <span style={{ fontSize: '13px', fontWeight: '600', color: '#64748b' }}>
           Live Synchronized with Dhaka Police Night Patrol Grid
         </span>
       </div>
 
-      {/* Main 3-Column Layout Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr 1.1fr', gap: '20px' }}>
+      {/* Main Full-Width Grid Layout */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+        gap: '24px',
+        width: '100%' 
+      }}>
         
         {/* Column 1: Route Analytics */}
         <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
@@ -91,13 +102,6 @@ export default function RoutePlanner() {
 
             <div style={{ backgroundColor: '#f8fafc', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
-                <ShieldCheck size={16} /> Safety Rating
-              </span>
-              <span style={{ fontWeight: '700', color: '#10b981' }}>96% High Lighting</span>
-            </div>
-
-            <div style={{ backgroundColor: '#f8fafc', borderRadius: '10px', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b' }}>
                 <PhoneCall size={16} /> Nearby Guard
               </span>
               <span style={{ fontWeight: '700', color: '#00b4d8' }}>Shahbagh Police Box</span>
@@ -143,4 +147,4 @@ export default function RoutePlanner() {
       </div>
     </div>
   );
-}
+} 

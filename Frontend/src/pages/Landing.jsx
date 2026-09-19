@@ -12,7 +12,7 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ backgroundColor: '#f1f5f9', color: '#0f172a', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div style={{ backgroundColor: '#f1f5f9', color: '#0f172a', fontFamily: 'system-ui, -apple-system, sans-serif', width: '100%', minHeight: '100vh' }}>
       
       {/* HERO SECTION */}
       <section style={{ padding: '80px 40px 100px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>

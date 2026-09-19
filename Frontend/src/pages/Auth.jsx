@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, MapPin, PhoneCall, Eye, EyeOff, Navigation, AlertTriangle, Users } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, Navigation, AlertTriangle, Users } from 'lucide-react';
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -8,28 +8,76 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
+  // Form states
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const endpoint = isSignUp ? '/api/auth/register' : '/api/auth/login';
+    const payload = isSignUp
+      ? {
+          name,
+          email: authMethod === 'email' ? email : undefined,
+          phone: authMethod === 'phone' ? phone : undefined,
+          password,
+        }
+      : {
+          email: authMethod === 'email' ? email : undefined,
+          phone: authMethod === 'phone' ? phone : undefined,
+          password,
+        };
+
+    try {
+      const res = await fetch(`http://localhost:5000${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Authentication failed. Please check your credentials.');
+      }
+
+      // Store authenticated session
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+
+      // Mark that user just signed in so popup shows only once
+      sessionStorage.setItem('show_welcome_popup', 'true');
+
+      navigate('/dashboard');
+    } catch (err) {
+      if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+        setError('Cannot connect to backend server. Please make sure server.js is running on port 5000.');
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#1e293b', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       
-      {/* 1. TOP UTILITY BANNER */}
-      <div style={{ backgroundColor: '#00b4d8', padding: '8px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#ffffff', fontWeight: '500' }}>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <MapPin size={14} /> Dhaka, Bangladesh
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <PhoneCall size={14} /> Helpline: 999
-          </span>
-        </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <span>support@saferoute.com</span>
-          <Link to="/" style={{ color: '#ffffff', textDecoration: 'none', fontWeight: 'bold' }}>
-            Back to Home
-          </Link>
-        </div>
-      </div>
-
-      {/* 2. SPLIT SCREEN AUTH CONTAINER */}
+      {/* SPLIT SCREEN AUTH CONTAINER */}
       <div style={{ flexGrow: 1, display: 'flex', flexWrap: 'wrap' }}>
         
         {/* LEFT SIDE: Branding, Visual Illustration & Feature Highlights */}
@@ -125,8 +173,43 @@ export default function Auth() {
             </div>
 
             {/* Credentials Form */}
-            <form onSubmit={(e) => { e.preventDefault(); navigate('/dashboard'); }} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
+              {/* Error Alert */}
+              {error && (
+                <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 16px', color: '#b91c1c', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle size={16} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {/* Full Name field when registering */}
+              {isSignUp && (
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px', textTransform: 'uppercase' }}>
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Tanvir Ahmed"
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 14px', 
+                      backgroundColor: '#ffffff', 
+                      color: '#0f172a', 
+                      border: '1.5px solid #cbd5e1', 
+                      borderRadius: '8px', 
+                      fontSize: '14px', 
+                      outline: 'none', 
+                      boxSizing: 'border-box' 
+                    }}
+                  />
+                </div>
+              )}
+
               {authMethod === 'email' ? (
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px', textTransform: 'uppercase' }}>
@@ -135,8 +218,20 @@ export default function Auth() {
                   <input
                     type="email"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="user@saferoute.com"
-                    style={{ width: '100%', padding: '12px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', color: '#0f172a', boxSizing: 'border-box' }}
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 14px', 
+                      backgroundColor: '#ffffff', 
+                      color: '#0f172a', 
+                      border: '1.5px solid #cbd5e1', 
+                      borderRadius: '8px', 
+                      fontSize: '14px', 
+                      outline: 'none', 
+                      boxSizing: 'border-box' 
+                    }}
                   />
                 </div>
               ) : (
@@ -147,8 +242,20 @@ export default function Auth() {
                   <input
                     type="tel"
                     required
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+880 1700-000000"
-                    style={{ width: '100%', padding: '12px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', color: '#0f172a', boxSizing: 'border-box' }}
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 14px', 
+                      backgroundColor: '#ffffff', 
+                      color: '#0f172a', 
+                      border: '1.5px solid #cbd5e1', 
+                      borderRadius: '8px', 
+                      fontSize: '14px', 
+                      outline: 'none', 
+                      boxSizing: 'border-box' 
+                    }}
                   />
                 </div>
               )}
@@ -161,8 +268,21 @@ export default function Auth() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    style={{ width: '100%', padding: '12px 40px 12px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '14px', outline: 'none', color: '#0f172a', boxSizing: 'border-box' }}
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 40px 12px 14px', 
+                      backgroundColor: '#ffffff', 
+                      color: '#0f172a', 
+                      border: '1.5px solid #cbd5e1', 
+                      borderRadius: '8px', 
+                      fontSize: '14px', 
+                      outline: 'none', 
+                      boxSizing: 'border-box' 
+                    }}
                   />
                   <button
                     type="button"
@@ -188,7 +308,7 @@ export default function Auth() {
               <div style={{ fontSize: '13px', color: '#64748b' }}>
                 {isSignUp ? 'Already have an account? ' : 'First time here? '}
                 <span 
-                  onClick={() => setIsSignUp(!isSignUp)} 
+                  onClick={() => { setIsSignUp(!isSignUp); setError(''); }} 
                   style={{ color: '#00b4d8', textDecoration: 'underline', fontWeight: '700', cursor: 'pointer' }}
                 >
                   {isSignUp ? 'Sign in' : 'Sign up'}
@@ -198,9 +318,22 @@ export default function Auth() {
               {/* Submit Button */}
               <button
                 type="submit"
-                style={{ backgroundColor: '#00b4d8', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: '800', fontSize: '14px', cursor: 'pointer', marginTop: '10px' }}
+                disabled={loading}
+                style={{ 
+                  backgroundColor: loading ? '#94a3b8' : '#00b4d8', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  padding: '14px', 
+                  borderRadius: '8px', 
+                  fontWeight: '800', 
+                  fontSize: '14px', 
+                  cursor: loading ? 'not-allowed' : 'pointer', 
+                  marginTop: '10px',
+                  boxShadow: '0 4px 14px rgba(0, 180, 216, 0.35)',
+                  transition: 'all 0.2s ease'
+                }}
               >
-                {isSignUp ? 'Create Account' : 'Sign in'}
+                {loading ? 'Please wait...' : (isSignUp ? 'Sign up' : 'Sign in')}
               </button>
 
             </form>

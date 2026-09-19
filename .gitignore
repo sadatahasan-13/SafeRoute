@@ -1,3 +1,26 @@
+# Dependency directories
+node_modules/
+Frontend/node_modules/
+Backend/node_modules/
+
+# Production build outputs
+dist/
+Frontend/dist/
+Backend/dist/
+dist-ssr/
+
+# Environment files and credentials (CRITICAL: Do not commit secrets)
+.env
+.env*
+*.env
+!.env.example
+Frontend/.env
+Frontend/.env*
+!Frontend/.env.example
+Backend/.env
+Backend/.env*
+!Backend/.env.example
+
 # Logs
 logs
 *.log
@@ -6,11 +29,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*

@@ -8,12 +8,14 @@ import {
   Route, 
   Rss, 
   Phone, 
-  LogOut 
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -24,8 +26,22 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  const handleLogout = async () => {
+    try {
+      await fetch('http://localhost:5000/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error('Logout request failed:', e);
+    } finally {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('show_welcome_popup');
+      navigate('/auth');
+    }
+  };
+
   return (
     <header style={{ width: '100%', fontFamily: 'system-ui, -apple-system, sans-serif', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 1000 }}>
+
       
       {/* 1. TOP UTILITY BANNER (Cyan #00b4d8) */}
       <div style={{ backgroundColor: '#00b4d8', padding: '6px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#ffffff', fontWeight: '600' }}>
@@ -89,25 +105,50 @@ export default function Navbar() {
 
           <div style={{ width: '1px', height: '24px', backgroundColor: '#e2e8f0', margin: '0 8px' }} />
 
-          {/* Logout Action */}
-          <button
-            onClick={() => navigate('/auth')}
-            style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              color: '#ef4444',
-              padding: '8px 14px',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              fontWeight: '700',
-              fontSize: '12px'
-            }}
-          >
-            <LogOut size={14} /> Log out
-          </button>
+          {/* Auth Action: Sign out if logged in, Sign in if logged out */}
+          {token ? (
+            <button
+              onClick={handleLogout}
+              style={{
+                backgroundColor: '#f0f9ff',
+                border: '1px solid #bae6fd',
+                color: '#00b4d8',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                fontWeight: '700',
+                fontSize: '12px',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <LogOut size={14} color="#00b4d8" /> Sign out
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              style={{
+                backgroundColor: '#00b4d8',
+                border: 'none',
+                color: '#ffffff',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                cursor: 'pointer',
+                fontWeight: '700',
+                fontSize: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 2px 6px rgba(0,180,216,0.3)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <LogIn size={14} color="#ffffff" /> Sign in
+            </Link>
+          )}
         </div>
 
       </div>
