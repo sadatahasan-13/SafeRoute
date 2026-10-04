@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { co2 } from '@tgwf/co2';
 import connectDB from './config/db.js';
 
 // Route imports
@@ -55,6 +56,53 @@ app.use(
     credentials: true,
   })
 );
+
+// ============================================================================
+// Carbon Footprint Tracking Middleware (@tgwf/co2) - Sustainable Web Design
+// ============================================================================
+const swdEmission = new co2({ model: 'swd' });
+
+app.use((req, res, next) => {
+  let requestBytes = 0;
+  let responseBytes = 0;
+
+  // Calculate request payload size
+  if (req.body && Object.keys(req.body).length > 0) {
+    try {
+      requestBytes = Buffer.byteLength(JSON.stringify(req.body), 'utf8');
+    } catch (e) {
+      requestBytes = 0;
+    }
+  }
+
+  // Intercept response stream to measure total bytes transferred
+  const originalWrite = res.write;
+  const originalEnd = res.end;
+
+  res.write = function (chunk) {
+    if (chunk) {
+      responseBytes += Buffer.byteLength(chunk, 'utf8');
+    }
+    return originalWrite.apply(res, arguments);
+  };
+
+  res.end = function (chunk) {
+    if (chunk) {
+      responseBytes += Buffer.byteLength(chunk, 'utf8');
+    }
+    const totalBytes = requestBytes + responseBytes;
+    const co2Grams = swdEmission.perByte(totalBytes);
+    const co2Mg = (co2Grams * 1000).toFixed(3);
+
+    // Attach carbon metrics to response headers
+    res.setHeader('X-Session-Bytes', totalBytes);
+    res.setHeader('X-Carbon-Emissions-mg', `${co2Mg} mg`);
+
+    return originalEnd.apply(res, arguments);
+  };
+
+  next();
+});
 
 // Base / Root Endpoint
 app.get('/', (req, res) => {
