@@ -508,22 +508,20 @@ export default function RoutePlanner() {
         </div>
       )}
 
-      {/* SAVED DHAKA ROUTES LIST (Stored in MongoDB Atlas) */}
-      <div style={{ marginTop: '28px', backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px 24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '800', color: '#0f172a' }}>
-              {isAdmin ? '👑 All Commuter Routes (Admin Central Dispatch)' : 'My Saved & Dispatched Routes in Dhaka'}
-            </h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
-              {isAdmin 
-                ? 'Inspecting all routes planned across Dhaka by commuters. Select a route to see details.'
-                : 'Select any of your personal routes to inspect its safety waypoints or launch live escort tracking.'}
-            </p>
-          </div>
+      {/* SAVED DHAKA ROUTES LIST (Stored in MongoDB Atlas) - ONLY SHOWN TO ADMIN */}
+      {isAdmin && (
+        <div style={{ marginTop: '28px', backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '20px 24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '800', color: '#0f172a' }}>
+                👑 All Commuter Routes (Admin Central Dispatch)
+              </h3>
+              <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+                Inspecting all routes planned across Dhaka by commuters. Select a route to see details.
+              </p>
+            </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {isAdmin && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <select
                 value={commuterFilter}
                 onChange={(e) => {
@@ -542,72 +540,66 @@ export default function RoutePlanner() {
                   <option key={val} value={val}>👤 {val}</option>
                 ))}
               </select>
-            )}
-            <span style={{ fontSize: '12px', fontWeight: '700', color: '#00b4d8' }}>
-              {displayedRoutes.length} Route{displayedRoutes.length === 1 ? '' : 's'} Recorded
-            </span>
+              <span style={{ fontSize: '12px', fontWeight: '700', color: '#00b4d8' }}>
+                {displayedRoutes.length} Route{displayedRoutes.length === 1 ? '' : 's'} Recorded
+              </span>
+            </div>
           </div>
-        </div>
 
-        {displayedRoutes.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '30px 20px', color: '#94a3b8', fontSize: '13px' }}>
-            No routes found for this view. Plan a route above to get started.
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '14px' }}>
-            {displayedRoutes.map((r) => {
-              const isSelected = selectedRoute?._id === r._id;
-              return (
-                <div
-                  key={r._id}
-                  onClick={() => setSelectedRoute(r)}
-                  style={{
-                    padding: '14px',
-                    borderRadius: '12px',
-                    border: isSelected ? '2px solid #00b4d8' : '1px solid #e2e8f0',
-                    backgroundColor: isSelected ? '#f0f9ff' : '#f8fafc',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    position: 'relative'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a' }}>
-                      {r.routeName}
-                    </span>
-                    <button
-                      onClick={(e) => handleDeleteRoute(r._id, e)}
-                      title="Remove route"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px' }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+          {displayedRoutes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '30px 20px', color: '#94a3b8', fontSize: '13px' }}>
+              No routes found for this view. Plan a route above to get started.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '14px' }}>
+              {displayedRoutes.map((r) => {
+                const isSelected = selectedRoute?._id === r._id;
+                return (
+                  <div
+                    key={r._id}
+                    onClick={() => setSelectedRoute(r)}
+                    style={{
+                      padding: '14px',
+                      borderRadius: '12px',
+                      border: isSelected ? '2px solid #00b4d8' : '1px solid #e2e8f0',
+                      backgroundColor: isSelected ? '#f0f9ff' : '#f8fafc',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a' }}>
+                        {r.routeName}
+                      </span>
+                      <button
+                        onClick={(e) => handleDeleteRoute(r._id, e)}
+                        title="Remove route"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '2px' }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
 
-                  {isAdmin && (
                     <div style={{ fontSize: '10px', color: '#0369a1', fontWeight: '800', backgroundColor: '#e0f2fe', padding: '2px 8px', borderRadius: '4px', marginBottom: '6px', display: 'inline-block' }}>
                       👤 Commuter: {r.user?.name || r.commuterName} {r.user?.email ? `(${r.user.email})` : ''}
                     </div>
-                  )}
 
-                  <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px' }}>
-                    {!isAdmin && (r.commuterName || 'My Route')} • {r.securityPreference}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
+                      <span style={{ fontWeight: '800', color: '#16a34a', backgroundColor: '#dcfce7', padding: '2px 6px', borderRadius: '4px' }}>
+                        {r.score}
+                      </span>
+                      <span style={{ color: '#64748b', fontWeight: '600' }}>
+                        {r.distance} • {r.time}
+                      </span>
+                    </div>
                   </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px' }}>
-                    <span style={{ fontWeight: '800', color: '#16a34a', backgroundColor: '#dcfce7', padding: '2px 6px', borderRadius: '4px' }}>
-                      {r.score}
-                    </span>
-                    <span style={{ color: '#64748b', fontWeight: '600' }}>
-                      {r.distance} • {r.time}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );
