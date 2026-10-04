@@ -39,6 +39,50 @@ const sendTokenResponse = (user, statusCode, res, message = 'Success') => {
     });
 };
 
+// Helper function to seed admin and commuter accounts if not existing
+export const ensureSeedUsers = async () => {
+  try {
+    const adminExists = await User.findOne({ email: 'admin@saferoute.bd' }).select('+password');
+    if (!adminExists) {
+      await User.create({
+        name: 'Central Admin',
+        email: 'admin@saferoute.bd',
+        password: 'admin123',
+        role: 'admin',
+      });
+    } else {
+      adminExists.name = 'Central Admin';
+      const match = await adminExists.matchPassword('admin123');
+      if (!match) {
+        adminExists.password = 'admin123';
+      }
+      adminExists.role = 'admin';
+      await adminExists.save();
+    }
+
+    const commuterExists = await User.findOne({ email: 'sadat@saferoute.bd' }).select('+password');
+    if (!commuterExists) {
+      await User.create({
+        name: 'Sadat Ahasan',
+        email: 'sadat@saferoute.bd',
+        password: 'user123',
+        role: 'user',
+      });
+    } else {
+      const match = await commuterExists.matchPassword('user123');
+      if (!match) {
+        commuterExists.password = 'user123';
+        await commuterExists.save();
+      }
+    }
+  } catch (e) {
+    // Ignore duplicate key errors in seeding
+  }
+};
+
+// Seed demo accounts on startup
+ensureSeedUsers();
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -76,12 +120,25 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
+    // Enforce Single-Admin Constraint: Only 1 Admin allowed in the entire system
+    const requestedRole = req.body.role === 'admin' ? 'admin' : 'user';
+    if (requestedRole === 'admin') {
+      const existingAdmin = await User.findOne({ role: 'admin' });
+      if (existingAdmin) {
+        return res.status(400).json({
+          success: false,
+          message: 'Only 1 Central Administrator is permitted in SafeRoute. Additional admins cannot be registered. Please sign up as a Night Commuter.',
+        });
+      }
+    }
+
     // Create new user (password is automatically hashed by Mongoose pre-save hook)
     const user = await User.create({
       name,
       email: email ? email.toLowerCase() : undefined,
       phone: phone || undefined,
       password,
+      role: requestedRole,
     });
 
     sendTokenResponse(user, 201, res, 'User registered successfully.');
@@ -95,6 +152,7 @@ export const registerUser = async (req, res, next) => {
 // @access  Public
 export const loginUser = async (req, res, next) => {
   try {
+    await ensureSeedUsers();
     const { email, phone, identifier, password } = req.body;
 
     if (!password) {

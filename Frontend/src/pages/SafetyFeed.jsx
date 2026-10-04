@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ShieldCheck, ThumbsUp, AlertCircle, MessageSquare, PlusCircle, 
   MapPin, Image as ImageIcon, Trash2, RefreshCw, Send, 
-  Search, CheckCircle2, Clock, Filter, AlertTriangle
+  Search, CheckCircle2, Clock, Filter, AlertTriangle, LogIn, X
 } from 'lucide-react';
 
 export default function SafetyFeed() {
@@ -18,6 +18,7 @@ export default function SafetyFeed() {
   const [commentText, setCommentText] = useState({});
   const [submittingComment, setSubmittingComment] = useState({});
   const [dbConnected, setDbConnected] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Current logged in user
   let currentUser = {};
@@ -127,6 +128,16 @@ export default function SafetyFeed() {
     return new Date(dateStr).toLocaleDateString();
   };
 
+  // Check auth before reporting
+  const handleReportClick = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setShowAuthModal(true);
+      return;
+    }
+    navigate('/report');
+  };
+
   // Categories for filtering
   const categories = ['All', 'Poor Lighting', 'Unsafe Road', 'Suspicious Activity', 'Harassment', 'Other'];
 
@@ -203,7 +214,7 @@ export default function SafetyFeed() {
 
             {/* KEEP REPORT HAZARD OPTION */}
             <button 
-              onClick={() => navigate('/report')}
+              onClick={handleReportClick}
               style={{ backgroundColor: '#00b4d8', color: '#ffffff', border: 'none', padding: '10px 20px', borderRadius: '10px', fontWeight: '800', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 14px rgba(0, 180, 216, 0.35)', transition: 'background 0.2s ease' }}
             >
               <PlusCircle size={17} /> Report Hazard
@@ -461,6 +472,80 @@ export default function SafetyFeed() {
         </div>
 
       </div>
+
+      {/* SIGN IN REQUIRED MODAL */}
+      {showAuthModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '18px',
+            padding: '32px 28px',
+            maxWidth: '420px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid #e2e8f0',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowAuthModal(false)}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+            >
+              <X size={18} />
+            </button>
+
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: '#e0f2fe',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto'
+            }}>
+              <LogIn size={28} color="#00b4d8" />
+            </div>
+
+            <h3 style={{ fontSize: '18px', fontWeight: '900', color: '#0f172a', margin: '0 0 8px 0' }}>
+              Sign In Required to Report
+            </h3>
+
+            <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5, margin: '0 0 24px 0' }}>
+              You must be signed in to submit a safety hazard or upload photo evidence. This ensures all community reports are authentic and verified.
+            </p>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                style={{ flex: 1, backgroundColor: '#f1f5f9', border: '1.5px solid #cbd5e1', color: '#475569', padding: '10px', borderRadius: '8px', fontWeight: '700', fontSize: '13px', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => navigate('/auth')}
+                style={{ flex: 1, backgroundColor: '#00b4d8', border: 'none', color: '#ffffff', padding: '10px', borderRadius: '8px', fontWeight: '800', fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0, 180, 216, 0.3)' }}
+              >
+                <LogIn size={15} /> Sign In Now
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -57,3 +57,29 @@ export const authorizeAdmin = (req, res, next) => {
   }
 };
 
+// Optional auth: attaches req.user if valid token provided, but doesn't block unauthenticated callers
+export const optionalAuth = async (req, res, next) => {
+  let token;
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
+
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'saferoute_super_secret_jwt_key_2026_dhaka_secure');
+    const user = await User.findById(decoded.id).select('-password');
+    if (user) {
+      req.user = user;
+    }
+  } catch (error) {
+    // Ignore invalid token in optional auth
+  }
+  next();
+};
+

@@ -8,12 +8,19 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import routeRoutes from './routes/routeRoutes.js';
 
 // Middleware imports
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
-// Load environment variables from .env
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables from Backend/.env
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Connect to MongoDB Database
 connectDB();
@@ -72,6 +79,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/routes', routeRoutes);
 
 // 404 & Central Error Handling
 app.use(notFound);

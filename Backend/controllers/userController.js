@@ -49,15 +49,30 @@ export const updateUserProfile = async (req, res, next) => {
   }
 };
 
-// @desc    Get all emergency contacts for logged-in user
+// @desc    Get all emergency contacts (Admin sees all users' contacts; Commuter sees only their own)
 // @route   GET /api/users/contacts
 // @access  Private
 export const getContacts = async (req, res, next) => {
   try {
-    const contacts = await EmergencyContact.find({ user: req.user._id });
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.email === 'admin@saferoute.bd');
+
+    let contacts;
+    if (isAdmin) {
+      // Admin sees ALL contacts registered across all commuters in Dhaka
+      contacts = await EmergencyContact.find({})
+        .populate('user', 'name email phone')
+        .sort({ createdAt: -1 });
+    } else {
+      // Commuter sees strictly their own emergency contacts
+      contacts = await EmergencyContact.find({ user: req.user._id })
+        .populate('user', 'name email phone')
+        .sort({ createdAt: -1 });
+    }
+
     res.status(200).json({
       success: true,
       count: contacts.length,
+      isAdmin: !!isAdmin,
       data: contacts,
     });
   } catch (error) {
@@ -96,15 +111,14 @@ export const addContact = async (req, res, next) => {
   }
 };
 
-// @desc    Delete emergency contact
+// @desc    Delete emergency contact (Admin can delete any; Commuter can delete only their own)
 // @route   DELETE /api/users/contacts/:id
 // @access  Private
 export const deleteContact = async (req, res, next) => {
   try {
-    const contact = await EmergencyContact.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-    });
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.email === 'admin@saferoute.bd');
+
+    const contact = await EmergencyContact.findById(req.params.id);
 
     if (!contact) {
       return res.status(404).json({
@@ -113,7 +127,14 @@ export const deleteContact = async (req, res, next) => {
       });
     }
 
-    await contact.deleteOne();
+    if (!isAdmin && contact.user && contact.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to delete this contact.',
+      });
+    }
+
+    await EmergencyContact.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
@@ -130,16 +151,21 @@ export const deleteContact = async (req, res, next) => {
 export const updateContact = async (req, res, next) => {
   try {
     const { name, phone, relation, isActive } = req.body;
+    const isAdmin = req.user && (req.user.role === 'admin' || req.user.email === 'admin@saferoute.bd');
 
-    const contact = await EmergencyContact.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-    });
+    const contact = await EmergencyContact.findById(req.params.id);
 
     if (!contact) {
       return res.status(404).json({
         success: false,
         message: 'Emergency contact not found.',
+      });
+    }
+
+    if (!isAdmin && contact.user && contact.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update this contact.',
       });
     }
 
@@ -159,5 +185,4 @@ export const updateContact = async (req, res, next) => {
     next(error);
   }
 };
-
 

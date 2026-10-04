@@ -1,9 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, MapPin, Camera, X, Image as ImageIcon, CheckCircle2, Loader2 } from 'lucide-react';
+import { 
+  AlertTriangle, MapPin, Camera, X, Image as ImageIcon, 
+  CheckCircle2, Loader2, LogIn, AlertCircle 
+} from 'lucide-react';
 
 export default function ReportIncident() {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
   const [hazardType, setHazardType] = useState('Poor Lighting');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
@@ -42,6 +46,11 @@ export default function ReportIncident() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      setError('You must be signed in to submit a hazard report. Please sign in first.');
+      return;
+    }
+
     if (!location.trim()) {
       setError('Please provide a location for this hazard report.');
       return;
@@ -68,8 +77,14 @@ export default function ReportIncident() {
         formData.append('image', imageFile);
       }
 
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('http://localhost:5000/api/reports', {
         method: 'POST',
+        headers,
         body: formData,
       });
 
@@ -102,6 +117,32 @@ export default function ReportIncident() {
             Help other night commuters by reporting road hazards, unlit streets, and safety issues with photos.
           </p>
         </div>
+
+        {/* UNAUTHENTICATED NOTICE */}
+        {!token && (
+          <div style={{ backgroundColor: '#eff6ff', border: '1.5px solid #bfdbfe', borderRadius: '16px', padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ backgroundColor: '#dbeafe', padding: '10px', borderRadius: '12px' }}>
+                <AlertCircle size={22} color="#2563eb" />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: '800', color: '#1e40af' }}>
+                  Sign in required to report hazards
+                </h4>
+                <p style={{ margin: '3px 0 0 0', fontSize: '12px', color: '#3b82f6' }}>
+                  You are currently signed out. You must be signed in to submit community road hazard reports and upload photo evidence.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/auth')}
+              style={{ backgroundColor: '#2563eb', color: '#ffffff', border: 'none', padding: '9px 18px', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)' }}
+            >
+              <LogIn size={14} /> Sign In to Report
+            </button>
+          </div>
+        )}
 
         {/* FORM CARD */}
         <form onSubmit={handleSubmit} style={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '20px', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -221,19 +262,29 @@ export default function ReportIncident() {
           )}
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ width: '100%', backgroundColor: loading ? '#94a3b8' : '#00b4d8', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: '800', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 4px 12px rgba(0, 180, 216, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            {loading ? (
-              <>
-                <Loader2 size={18} className="animate-spin" /> Uploading to Cloudinary & Saving...
-              </>
-            ) : (
-              'Submit Report'
-            )}
-          </button>
+          {!token ? (
+            <button
+              type="button"
+              onClick={() => navigate('/auth')}
+              style={{ width: '100%', backgroundColor: '#0f172a', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: '800', cursor: 'pointer', boxShadow: '0 4px 12px rgba(15, 23, 42, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s ease' }}
+            >
+              <LogIn size={18} color="#38bdf8" /> Sign In to Submit Report
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ width: '100%', backgroundColor: loading ? '#94a3b8' : '#00b4d8', color: '#ffffff', border: 'none', padding: '14px', borderRadius: '12px', fontSize: '14px', fontWeight: '800', cursor: loading ? 'not-allowed' : 'pointer', boxShadow: '0 4px 12px rgba(0, 180, 216, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" /> Uploading to Cloudinary & Saving...
+                </>
+              ) : (
+                'Submit Report'
+              )}
+            </button>
+          )}
 
           {/* Success Notification */}
           {sent && (

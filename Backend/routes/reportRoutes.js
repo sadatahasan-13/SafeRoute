@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.route('/')
   .get(getReports)
-  .post(upload.single('image'), createReport);
+  .post(protect, upload.single('image'), createReport);
 
 router.route('/:id')
   .get(getReportById)
